@@ -10,3 +10,4 @@ edition = "2018"
 # ethereum-bn128 = { git = "https://github.com/ewasm/ethereum-bn128.rs", rev = "10968881fc5195f9c6d8f2960a8f7baae13fba3c" }
 ethereum-bn128 = { path = "../ethereum-bn128.rs" }
 hex = "0.3.2"
+num-bigint = "0.2.2"
