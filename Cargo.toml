@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-# ethereum-bn128 = { git = "https://github.com/ewasm/ethereum-bn128.rs", rev = "10968881fc5195f9c6d8f2960a8f7baae13fba3c" }
-ethereum-bn128 = { path = "../ethereum-bn128.rs" }
+ethereum-bn128 = { git = "https://github.com/jwasinger/ethereum-bn128.rs", branch = "roll_up" }
+# ethereum-bn128 = { path = "../ethereum-bn128.rs" }
 hex = "0.3.2"
 num-bigint = "0.2.2"
