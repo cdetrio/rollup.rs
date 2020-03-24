@@ -6,8 +6,27 @@ edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+name = "rollup_rs"
+crate-type = ["cdylib"]
+path = "src/main.rs"
+
+[[bin]]
+name = "rollup_rs"
+path = "src/main.rs"
+
 [dependencies]
-ethereum-bn128 = { git = "https://github.com/jwasinger/ethereum-bn128.rs", branch = "roll_up" }
-# ethereum-bn128 = { path = "../ethereum-bn128.rs" }
+#ethereum-bn128 = { git = "https://github.com/ewasm/ethereum-bn128.rs" }
+#ethereum-bn128 = { git = "https://github.com/jwasinger/ethereum-bn128.rs", branch = "roll_up" }
+ethereum-bn128 = { path = "./ethereum-bn128.rs" }
 hex = "0.3.2"
 num-bigint = "0.2.2"
+ewasm_api = { version = "0.10", features = ["std", "eth2", "qimalloc"] }
+
+[profile.release]
+opt-level = 3
+debug = false
+lto = true
+debug-assertions = false
+overflow-checks = false
+panic = "abort"
