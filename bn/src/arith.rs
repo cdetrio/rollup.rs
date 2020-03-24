@@ -2,6 +2,12 @@ use std::cmp::Ordering;
 use std::fmt;
 use rand::Rng;
 
+extern "C" {
+    fn submod256(aOffset: *const u128, bOffset: *const u128, modOffset: *const u128, resultOffset: *const u128);
+    fn addmod256(aOffset: *const u128, bOffset: *const u128, modOffset: *const u128, resultOffset: *const u128);
+    fn mulmodmont256(aOffset: *const u128, bOffset: *const u128, modOffset: *const u128, invOffset: *const u128, resultOffset: *const u128);
+}
+
 #[cfg(feature = "rustc-serialize")]
 use rustc_serialize::{Decodable, Decoder, Encodable, Encoder};
 use byteorder::{BigEndian, ByteOrder};
@@ -345,6 +351,10 @@ impl U256 {
         }
     }
 
+
+    /*
+    // ****** native rust arithmetic for add, sub, mul ********
+
     /// Add `other` to `self` (mod `modulo`)
     pub fn add(&mut self, other: &U256, modulo: &U256) {
         add_nocarry(&mut self.0, &other.0);
@@ -367,37 +377,49 @@ impl U256 {
     /// multiplication method.
     pub fn mul(&mut self, other: &U256, modulo: &U256, inv: u128) {
         mul_reduce(&mut self.0, &other.0, &modulo.0, inv);
-        /*
-        start precompute
-        starting fq2 mul
-        arith.rs mul self: [214074591850708273407762144296610719636, 58616384586783718920706609768015664694], other: [224739864610436670812496060866698535692, 49473075070928017820063523758111889148]
-        Fq(a10d4444fea44189f22d894dffae67942c191ae34b6b9b4a8598a7b98c851636) * Fq(a91352d092c983007f7932bb7e79e30c25382aec8d64292e5ab5b95741fe96fc) = Fq(1f47f60c751c42359e963944aa121e8f240be5176dc5ab6f6b169879dafdd34f)
-        */
-        /*
-        let mut found = false;
-        let find = U256([214074591850708273407762144296610719636, 58616384586783718920706609768015664694]);
-        if (self.0)[0] == (find.0)[0] && (self.0)[1] == (find.0)[1] {
-            //println!("arith.rs before mul_reduce self: {:?}, other: {:?}", self.0, other.0);
-            found = true;
-            //println!("modulo: {:?}", modulo.0);
-            //println!("inv: {:?}", inv);
-            mul_reduce(&mut self.0, &other.0, &modulo.0, inv, false);
-        } else {
-            mul_reduce(&mut self.0, &other.0, &modulo.0, inv, false);
-        }
-        */
-        
 
         if *self >= *modulo {
             sub_noborrow(&mut self.0, &modulo.0);
         }
-        /*
-        if found {
-            println!("arith.rs after mul_reduce self: {:?}", self.0);
-        }
-        */
 
     }
+    */
+
+
+
+    // ******* bignum host function arithmetic for add, sub, mul *******
+
+    pub fn add(&mut self, other: &U256, modulo: &U256) {
+        let self_ptr = &self.0 as *const u128;
+        let other_ptr = &other.0 as *const u128;
+        let mod_ptr = &modulo.0 as *const u128;
+        unsafe {
+            addmod256(self_ptr, other_ptr, mod_ptr, self_ptr);
+        }
+    }
+
+    pub fn sub(&mut self, other: &U256, modulo: &U256) {
+        let self_ptr = &self.0 as *const u128;
+        let other_ptr = &other.0 as *const u128;
+        let mod_ptr = &modulo.0 as *const u128;
+        unsafe {
+            submod256(self_ptr, other_ptr, mod_ptr, self_ptr);
+        }
+    }
+
+    pub fn mul(&mut self, other: &U256, modulo: &U256, inv: u128) {
+        let self_ptr = &self.0 as *const u128;
+        let other_ptr = &other.0 as *const u128;
+        let mod_ptr = &modulo.0 as *const u128;
+        let inv_ptr = &inv as *const u128;
+
+        unsafe {
+            mulmodmont256(self_ptr, other_ptr, mod_ptr, inv_ptr, self_ptr);
+        }
+    }
+
+
+
 
     /// Turn `self` into its additive inverse (mod `modulo`)
     pub fn neg(&mut self, modulo: &U256) {
