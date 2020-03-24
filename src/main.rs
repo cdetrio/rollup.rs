@@ -1,6 +1,10 @@
 use std::str::FromStr;
 
-use std::time::{Instant};
+//use std::time::{Instant};
+
+//extern crate wee_alloc;
+//#[global_allocator]
+//static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
 extern crate ewasm_api;
 
@@ -24,11 +28,9 @@ fn negate(x: BigUint, y: BigUint) -> G1 {
 }
 
 
-//#[no_mangle]
-//pub extern "C" fn main() {
-
-pub fn main() {
-    let start_pairing = Instant::now();
+#[no_mangle]
+pub extern "C" fn main() {
+    //let start_pairing = Instant::now();
 
     // proof_a 96 bytes
     // 089f41b0e239736338dbacf5893756a5a97ccbacb0f6ba326767b161018a803f26e20505b4f4a99859be674e5fc17025a6b81236302e6c21a59f95e0873b9fa4
@@ -56,11 +58,11 @@ pub fn main() {
 
 
     /* ** for scout build **/
-    //let post_state_root = ewasm_api::types::Bytes32::from(output);
-    //ewasm_api::eth2::save_post_state_root(&post_state_root);
+    let post_state_root = ewasm_api::types::Bytes32::from(output);
+    ewasm_api::eth2::save_post_state_root(&post_state_root);
 
 
-
-    let pairing_duration = start_pairing.elapsed();
-    println!("pairing check time: {:?}", pairing_duration);
+    // for native benchmarking
+    //let pairing_duration = start_pairing.elapsed();
+    //println!("pairing check time: {:?}", pairing_duration);
 }
